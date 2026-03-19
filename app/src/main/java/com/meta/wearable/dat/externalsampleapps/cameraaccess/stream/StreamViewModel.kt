@@ -38,6 +38,10 @@ import com.meta.wearable.dat.camera.types.VideoFrame
 import com.meta.wearable.dat.camera.types.VideoQuality
 import com.meta.wearable.dat.core.Wearables
 import com.meta.wearable.dat.core.selectors.DeviceSelector
+import com.meta.wearable.dat.externalsampleapps.cameraaccess.data.repository.VideoRecorderImpl
+import com.meta.wearable.dat.externalsampleapps.cameraaccess.domain.usecase.RecordFrameUseCase
+import com.meta.wearable.dat.externalsampleapps.cameraaccess.domain.usecase.StartRecordingUseCase
+import com.meta.wearable.dat.externalsampleapps.cameraaccess.domain.usecase.StopRecordingUseCase
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.wearables.WearablesViewModel
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -53,6 +57,9 @@ import kotlinx.coroutines.launch
 class StreamViewModel(
     application: Application,
     private val wearablesViewModel: WearablesViewModel,
+    private val startRecordingUseCase: StartRecordingUseCase,
+    private val recordFrameUseCase: RecordFrameUseCase,
+    private val stopRecordingUseCase: StopRecordingUseCase,
 ) : AndroidViewModel(application) {
 
   companion object {
@@ -102,6 +109,18 @@ class StreamViewModel(
                 StreamConfiguration(videoQuality = VideoQuality.MEDIUM, 24),
             )
             .also { streamSession = it }
+
+    val outputFile = File(getApplication<Application>().cacheDir, "recording_${System.currentTimeMillis()}.mp4")
+    viewModelScope.launch {
+      startRecordingUseCase(504, 896, 24, outputFile)
+          .onSuccess {
+            _uiState.update { it.copy(isRecording = true) }
+          }
+          .onFailure { error ->
+            Log.e(TAG, "Failed to start recording", error)
+          }
+    }
+
     videoJob = viewModelScope.launch { streamSession.videoStream.collect { handleVideoFrame(it) } }
     stateJob =
         viewModelScope.launch {
@@ -109,10 +128,13 @@ class StreamViewModel(
             val prevState = _uiState.value.streamSessionState
             _uiState.update { it.copy(streamSessionState = currentState) }
 
-            // navigate back when state transitioned to STOPPED
+            // navigate back when state transitioned to STOPPED if we are NOT recording
             if (currentState != prevState && currentState == StreamSessionState.STOPPED) {
+              val isRecording = _uiState.value.isRecording
               stopStream()
-              wearablesViewModel.navigateToDeviceSelection()
+              if (!isRecording) {
+                  wearablesViewModel.navigateToDeviceSelection()
+              }
             }
           }
         }
@@ -127,7 +149,28 @@ class StreamViewModel(
     presentationQueue = null
     streamSession?.close()
     streamSession = null
-    _uiState.update { INITIAL_STATE }
+
+    val wasRecording = _uiState.value.isRecording
+    _uiState.update { INITIAL_STATE.copy(recordedVideoPath = it.recordedVideoPath) }
+
+    if (wasRecording) {
+      viewModelScope.launch {
+        stopRecordingUseCase()
+            .onSuccess { file ->
+              Log.d(TAG, "Recording saved to ${file.absolutePath}")
+              _uiState.update { it.copy(recordedVideoPath = file.absolutePath) }
+            }
+            .onFailure { error ->
+              Log.e(TAG, "Failed to stop recording", error)
+              wearablesViewModel.navigateToDeviceSelection()
+            }
+      }
+    }
+  }
+
+  fun clearRecordedVideoAndClose() {
+    _uiState.update { it.copy(recordedVideoPath = null) }
+    wearablesViewModel.navigateToDeviceSelection()
   }
 
   fun capturePhoto() {
@@ -210,6 +253,15 @@ class StreamViewModel(
       )
     } else {
       Log.e(TAG, "Failed to convert YUV to bitmap")
+    }
+
+    if (_uiState.value.isRecording) {
+      viewModelScope.launch {
+        recordFrameUseCase(videoFrame.buffer.duplicate(), videoFrame.presentationTimeUs)
+            .onFailure { error ->
+              Log.e(TAG, "Failed to record frame", error)
+            }
+      }
     }
   }
 
@@ -319,10 +371,18 @@ class StreamViewModel(
   ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
       if (modelClass.isAssignableFrom(StreamViewModel::class.java)) {
+        val videoRecorder = VideoRecorderImpl()
+        val startRecordingUseCase = StartRecordingUseCase(videoRecorder)
+        val recordFrameUseCase = RecordFrameUseCase(videoRecorder)
+        val stopRecordingUseCase = StopRecordingUseCase(videoRecorder)
+
         @Suppress("UNCHECKED_CAST", "KotlinGenericsCast")
         return StreamViewModel(
             application = application,
             wearablesViewModel = wearablesViewModel,
+            startRecordingUseCase = startRecordingUseCase,
+            recordFrameUseCase = recordFrameUseCase,
+            stopRecordingUseCase = stopRecordingUseCase,
         )
             as T
       }
