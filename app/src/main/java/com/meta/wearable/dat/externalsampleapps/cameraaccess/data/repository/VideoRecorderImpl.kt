@@ -67,7 +67,18 @@ class VideoRecorderImpl : VideoRecorder {
                 // Get the input Image to properly align planar data to whatever format the hardware requires (NV12, etc)
                 val inputImage = codec.getInputImage(inputBufferIndex)
                 if (inputImage != null) {
-                    copyI420ToImage(inputBufferCopy, inputImage, videoWidth, videoHeight)
+                    val capacity = inputBufferCopy.capacity()
+                    val srcWidth: Int
+                    val srcHeight: Int
+                    // Determine the source dimensions dynamically based on I420 payload sizes
+                    when (capacity) {
+                        1382400 -> { srcWidth = 720; srcHeight = 1280 } // VideoQuality.HIGH
+                        677376 -> { srcWidth = 504; srcHeight = 896 }   // VideoQuality.MEDIUM
+                        345600 -> { srcWidth = 360; srcHeight = 640 }   // VideoQuality.LOW
+                        else -> { srcWidth = videoWidth; srcHeight = videoHeight } // Fallback
+                    }
+
+                    copyI420ToImage(inputBufferCopy, inputImage, videoWidth, videoHeight, srcWidth, srcHeight)
                     
                     val size = codec.getInputBuffer(inputBufferIndex)?.capacity() ?: (videoWidth * videoHeight * 3 / 2)
                     codec.queueInputBuffer(
@@ -87,26 +98,34 @@ class VideoRecorderImpl : VideoRecorder {
         }
     }
 
-    private fun copyI420ToImage(inputBuffer: ByteBuffer, image: android.media.Image, width: Int, height: Int) {
+    private fun copyI420ToImage(
+        inputBuffer: ByteBuffer, 
+        image: android.media.Image, 
+        dstWidth: Int, 
+        dstHeight: Int,
+        srcWidth: Int,
+        srcHeight: Int
+    ) {
         val planes = image.planes
         inputBuffer.position(0)
 
-        // Allocate a row buffer once per frame to minimize GC.
-        // Size it to the max width needed (Y plane width).
-        val rowData = ByteArray(width)
+        // Allocate a row buffer sized to the max source width needed (Y plane width).
+        val rowData = ByteArray(srcWidth)
 
         // Y Plane
-        copyPlane(inputBuffer, width, height, planes[0], rowData)
+        copyPlane(inputBuffer, dstWidth, dstHeight, srcWidth, srcHeight, planes[0], rowData)
         // U Plane
-        copyPlane(inputBuffer, width / 2, height / 2, planes[1], rowData)
+        copyPlane(inputBuffer, dstWidth / 2, dstHeight / 2, srcWidth / 2, srcHeight / 2, planes[1], rowData)
         // V Plane
-        copyPlane(inputBuffer, width / 2, height / 2, planes[2], rowData)
+        copyPlane(inputBuffer, dstWidth / 2, dstHeight / 2, srcWidth / 2, srcHeight / 2, planes[2], rowData)
     }
 
     private fun copyPlane(
         inputBuffer: ByteBuffer,
-        width: Int,
-        height: Int,
+        dstWidth: Int,
+        dstHeight: Int,
+        srcWidth: Int,
+        srcHeight: Int,
         outputPlane: android.media.Image.Plane,
         rowData: ByteArray
     ) {
@@ -116,23 +135,42 @@ class VideoRecorderImpl : VideoRecorder {
 
         outputBuffer.position(0)
 
-        for (row in 0 until height) {
-            // Read a horizontal line from the planar I420 input
-            inputBuffer.get(rowData, 0, width)
+        // Calculate center crop offsets
+        val startX = maxOf(0, (srcWidth - dstWidth) / 2)
+        val startY = maxOf(0, (srcHeight - dstHeight) / 2)
+        val copyWidth = minOf(srcWidth, dstWidth)
+        val copyHeight = minOf(srcHeight, dstHeight)
 
+        // Skip source rows before the crop area
+        val startOffset = startY * srcWidth
+        inputBuffer.position(inputBuffer.position() + startOffset)
+
+        val horizontalPadding = maxOf(0, (dstWidth - srcWidth) / 2)
+        val verticalPadding = maxOf(0, (dstHeight - srcHeight) / 2)
+
+        for (row in 0 until copyHeight) {
+            // Read a full source row into rowData
+            inputBuffer.get(rowData, 0, srcWidth)
+
+            val dstRow = row + verticalPadding
+            
             if (outputPixelStride == 1) {
-                // Planar format fast-path: we can put the entire row at once
-                outputBuffer.position(row * outputRowStride)
-                outputBuffer.put(rowData, 0, width)
+                // Planar format fast-path: we can put the entire cropped row at once
+                outputBuffer.position(dstRow * outputRowStride + horizontalPadding)
+                outputBuffer.put(rowData, startX, copyWidth)
             } else {
                 // Semi-planar format (e.g. NV12): we must interleave the bytes
-                var outPos = row * outputRowStride
-                for (col in 0 until width) {
-                    outputBuffer.put(outPos, rowData[col])
+                var outPos = dstRow * outputRowStride + horizontalPadding * outputPixelStride
+                for (col in 0 until copyWidth) {
+                    outputBuffer.put(outPos, rowData[startX + col])
                     outPos += outputPixelStride
                 }
             }
         }
+
+        // Skip remaining source rows
+        val remainingRows = srcHeight - startY - copyHeight
+        inputBuffer.position(inputBuffer.position() + remainingRows * srcWidth)
     }
 
     override suspend fun stop(): Result<File> = withContext(Dispatchers.IO) {

@@ -106,13 +106,13 @@ class StreamViewModel(
         Wearables.startStreamSession(
                 getApplication(),
                 deviceSelector,
-                StreamConfiguration(videoQuality = VideoQuality.MEDIUM, 24),
+                StreamConfiguration(videoQuality = VideoQuality.HIGH, 30),
             )
             .also { streamSession = it }
 
     val outputFile = File(getApplication<Application>().cacheDir, "recording_${System.currentTimeMillis()}.mp4")
     viewModelScope.launch {
-      startRecordingUseCase(504, 896, 24, outputFile)
+      startRecordingUseCase(504, 896, 30, outputFile)
           .onSuccess {
             _uiState.update { it.copy(isRecording = true) }
           }
