@@ -1,5 +1,6 @@
 package com.meta.wearable.dat.externalsampleapps.cameraaccess.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.data.WorldLabsRepository
@@ -12,7 +13,7 @@ import java.io.File
 sealed class ConvertUiState {
     object Idle : ConvertUiState()
     data class Loading(val message: String) : ConvertUiState()
-    data class Success(val marbleUrl: String) : ConvertUiState()
+    data class Success(val splatUrl: String) : ConvertUiState()
     data class Error(val message: String) : ConvertUiState()
 }
 
@@ -35,9 +36,11 @@ class ConvertViewModel : ViewModel() {
                 val operationId = repo.generateWorld(assetId)
 
                 _uiState.value = ConvertUiState.Loading("This takes ~5 mins, please wait...")
-                val marbleUrl = repo.pollUntilReady(operationId)
+                val splatUrl = repo.pollUntilReady(operationId)
 
-                _uiState.value = ConvertUiState.Success(marbleUrl)
+                Log.d("WorldLabs", "SPZ URL: $splatUrl")
+
+                _uiState.value = ConvertUiState.Success(splatUrl)
             } catch (e: Exception) {
                 _uiState.value = ConvertUiState.Error(e.message ?: "Unknown error")
             }

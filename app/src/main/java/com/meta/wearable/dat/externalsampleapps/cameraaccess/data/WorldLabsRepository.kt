@@ -46,8 +46,6 @@ class WorldLabsRepository {
         try {
             val jsonResponse = JSONObject(responseBody)
             
-            // Looking at the screenshot, the exact keys are:
-            // {"media_asset":{"media_asset_id":"..."}, ... "upload_info":{"upload_url":"..."}}
             val mediaAsset = jsonResponse.optJSONObject("media_asset")
             val mediaAssetId = mediaAsset?.optString("media_asset_id") 
                 ?: jsonResponse.optString("media_asset_id", "")
@@ -70,7 +68,6 @@ class WorldLabsRepository {
         val body = videoFile.asRequestBody("video/mp4".toMediaType())
         val request = Request.Builder()
             .url(signedUrl)
-            // Looking at the "required_headers" in the screenshot, WorldLabs expects x-goog-content-length-range: 0,104857600
             .addHeader("x-goog-content-length-range", "0,104857600") 
             .put(body)
             .build()
@@ -157,7 +154,10 @@ class WorldLabsRepository {
             if (done) {
                 if (jsonResponse.has("response")) {
                     val responseObj = jsonResponse.getJSONObject("response")
-                    return responseObj.optString("world_marble_url", responseObj.optString("marbleUrl", ""))
+                    return responseObj.getJSONObject("assets")
+                        .getJSONObject("splats")
+                        .getJSONObject("spz_urls")
+                        .getString("500k")
                 } else {
                     throw IOException("No response object found when done is true. Raw: $responseBody")
                 }

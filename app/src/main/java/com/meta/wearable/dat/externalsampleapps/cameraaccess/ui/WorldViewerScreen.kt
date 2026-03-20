@@ -1,8 +1,8 @@
 package com.meta.wearable.dat.externalsampleapps.cameraaccess.ui
 
+import android.net.Uri
 import android.view.View
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
@@ -24,7 +24,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun WorldViewerScreen(marbleUrl: String, onClose: () -> Unit) {
+fun WorldViewerScreen(splatUrl: String, onClose: () -> Unit) {
     val systemUiController = rememberSystemUiController()
     
     DisposableEffect(Unit) {
@@ -33,6 +33,8 @@ fun WorldViewerScreen(marbleUrl: String, onClose: () -> Unit) {
             systemUiController.isSystemBarsVisible = true
         }
     }
+
+    val viewerUrl = "https://rangesh06.github.io/splat-viewer/?url=${Uri.encode(splatUrl)}"
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         AndroidView(
@@ -44,27 +46,10 @@ fun WorldViewerScreen(marbleUrl: String, onClose: () -> Unit) {
                     settings.loadWithOverviewMode = true
                     settings.useWideViewPort = true
                     settings.mediaPlaybackRequiresUserGesture = false
-                    
-                    // Allow content to be displayed correctly and fully scale
-                    settings.setSupportZoom(true)
-                    settings.builtInZoomControls = true
-                    settings.displayZoomControls = false
-
                     setLayerType(View.LAYER_TYPE_HARDWARE, null)
                     webChromeClient = WebChromeClient()
-                    webViewClient = object : WebViewClient() {
-                        override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                            return false // Force links to open within the WebView
-                        }
-                    }
-                    
-                    // Check World Labs documentation format for embeds. 
-                    // Often just appending '/embed' or '?mode=embed' works.
-                    var finalUrl = marbleUrl
-                    if (!finalUrl.contains("/embed")) {
-                       finalUrl = if (finalUrl.endsWith("/")) "${finalUrl}embed" else "$finalUrl/embed"
-                    }
-                    loadUrl(finalUrl)
+                    webViewClient = WebViewClient()
+                    loadUrl(viewerUrl)
                 }
             }
         )

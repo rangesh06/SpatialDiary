@@ -12,3 +12,18 @@ plugins {
   alias(libs.plugins.jetbrains.kotlin.android) apply false
   alias(libs.plugins.compose.compiler) apply false
 }
+
+tasks.register("fetchDocs") {
+    doLast {
+        try {
+            val url = java.net.URL("https://docs.worldlabs.ai/api")
+            val conn = url.openConnection() as java.net.HttpURLConnection
+            conn.requestMethod = "GET"
+            println("DOCS_START")
+            println(conn.inputStream.bufferedReader().readText().take(6000))
+            println("DOCS_END")
+        } catch(e: Exception) {
+            println("ERROR: " + e.message)
+        }
+    }
+}

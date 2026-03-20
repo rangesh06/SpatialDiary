@@ -42,16 +42,15 @@ fun VideoPlayerScreen(
     convertViewModel: ConvertViewModel = viewModel()
 ) {
     val convertUiState by convertViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     if (convertUiState is ConvertUiState.Success) {
         WorldViewerScreen(
-            marbleUrl = (convertUiState as ConvertUiState.Success).marbleUrl,
+            splatUrl = (convertUiState as ConvertUiState.Success).splatUrl,
             onClose = { convertViewModel.resetState() }
         )
         return
     }
-
-    val context = LocalContext.current
 
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
