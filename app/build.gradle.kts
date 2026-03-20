@@ -6,10 +6,19 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.jetbrains.kotlin.android)
   alias(libs.plugins.compose.compiler)
+}
+
+val localProps = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+  localProps.load(FileInputStream(localPropsFile))
 }
 
 android {
@@ -27,6 +36,7 @@ android {
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     vectorDrawables { useSupportLibrary = true }
+    buildConfigField("String", "WORLD_LABS_API_KEY", "\"${localProps.getProperty("worldlabsAPI") ?: ""}\"")
   }
 
   buildTypes {
@@ -60,6 +70,7 @@ dependencies {
   implementation(libs.androidx.exifinterface)
   implementation(libs.androidx.lifecycle.runtime.compose)
   implementation(libs.androidx.lifecycle.viewmodel.compose)
+  implementation(libs.androidx.lifecycle.viewmodel.ktx)
   implementation(libs.androidx.material.icons.extended)
   implementation(libs.androidx.material3)
   implementation(libs.kotlinx.collections.immutable)
@@ -68,6 +79,10 @@ dependencies {
   implementation(libs.mwdat.mockdevice)
   implementation(libs.androidx.media3.exoplayer)
   implementation(libs.androidx.media3.ui)
+  implementation(libs.okhttp)
+  implementation(libs.coroutines.android)
+  implementation(libs.accompanist.systemuicontroller)
+  implementation(libs.navigation.compose)
   androidTestImplementation(libs.androidx.ui.test.junit4)
   androidTestImplementation(libs.androidx.test.uiautomator)
   androidTestImplementation(libs.androidx.test.rules)
