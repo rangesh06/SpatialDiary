@@ -1,5 +1,6 @@
 package com.meta.wearable.dat.externalsampleapps.cameraaccess.data
 
+import android.util.Log
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.BuildConfig
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -14,12 +15,17 @@ import okhttp3.Response
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
+import java.util.concurrent.TimeUnit
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 class WorldLabsRepository {
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .build()
 
     suspend fun prepareUpload(fileName: String): Pair<String, String> {
         val url = "https://api.worldlabs.ai/marble/v1/media-assets:prepare_upload"
@@ -125,49 +131,87 @@ class WorldLabsRepository {
         }
     }
 
-    suspend fun pollUntilReady(operationId: String): String {
+    suspend fun pollUntilReady(
+        operationId: String,
+        onProgress: (String) -> Unit = {}
+    ): String {
         val cleanOpId = operationId.removePrefix("operations/")
-        
         val url = "https://api.worldlabs.ai/marble/v1/operations/$cleanOpId"
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("WLT-Api-Key", BuildConfig.WORLD_LABS_API_KEY)
-            .get()
-            .build()
+        
+        val maxAttempts = 90
+        var failStreak = 0
+        val maxFailStreak = 5
 
-        var attempts = 0
-        while (attempts < 60) {
-            val response = client.newCall(request).await()
-            if (!response.isSuccessful) {
-                val errBody = response.body?.string() ?: ""
-                throw IOException("Polling Error (Code ${response.code}): $errBody")
-            }
-            
-            val responseBody = response.body?.string() ?: throw IOException("Empty response body")
-            val jsonResponse = JSONObject(responseBody)
-            
-            if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
-                throw IOException("Error generating world: ${jsonResponse.getJSONObject("error").optString("message", "Unknown error")}")
-            }
+        repeat(maxAttempts) { attempt ->
+            try {
+                val request = Request.Builder()
+                    .url(url)
+                    .addHeader("WLT-Api-Key", BuildConfig.WORLD_LABS_API_KEY)
+                    .get()
+                    .build()
 
-            val done = jsonResponse.optBoolean("done", false)
-            if (done) {
-                if (jsonResponse.has("response")) {
-                    val responseObj = jsonResponse.getJSONObject("response")
-                    return responseObj.getJSONObject("assets")
-                        .getJSONObject("splats")
-                        .getJSONObject("spz_urls")
-                        .getString("500k")
-                } else {
-                    throw IOException("No response object found when done is true. Raw: $responseBody")
+                val response = client.newCall(request).await()
+                if (!response.isSuccessful) {
+                    val errBody = response.body?.string() ?: ""
+                    // Throw distinct exceptions for unrecoverable 4xx errors
+                    if (response.code in 400..499 && response.code != 408 && response.code != 429) {
+                        throw IllegalArgumentException("Client Error (Code ${response.code}): $errBody")
+                    }
+                    throw IOException("Server Error (Code ${response.code}): $errBody")
                 }
+                
+                val responseBody = response.body?.string() ?: throw IOException("Empty response body")
+                val jsonResponse = JSONObject(responseBody)
+                
+                // Reset fail streak on successful API response
+                failStreak = 0
+                
+                // Update progress using the callback if metadata exists
+                val description = jsonResponse
+                    .optJSONObject("metadata")
+                    ?.optJSONObject("progress")
+                    ?.optString("description", "Processing...") ?: "Processing..."
+                onProgress(description)
+
+                // Check for terminal error
+                if (jsonResponse.has("error") && !jsonResponse.isNull("error")) {
+                    throw IllegalStateException("Error generating world: ${jsonResponse.getJSONObject("error").optString("message", "Unknown error")}")
+                }
+
+                val done = jsonResponse.optBoolean("done", false)
+                if (done) {
+                    if (jsonResponse.has("response")) {
+                        val responseObj = jsonResponse.getJSONObject("response")
+                        return responseObj.getJSONObject("assets")
+                            .getJSONObject("splats")
+                            .getJSONObject("spz_urls")
+                            .getString("500k")
+                    } else {
+                        throw IllegalStateException("No response object found when done is true. Raw: $responseBody")
+                    }
+                }
+            } catch (e: Exception) {
+                // Do not retry if the error is terminal (client error, semantic error)
+                if (e is IllegalArgumentException || e is IllegalStateException) {
+                    throw e
+                }
+
+                failStreak++
+                Log.w("WorldLabs", "Poll attempt $attempt failed ($failStreak streak): ${e.message}")
+                
+                // Crash only after crossing consecutive failure limit
+                if (failStreak >= maxFailStreak) {
+                    throw Exception("Connection lost after $maxFailStreak failed attempts. Please check your connection. Details: ${e.message}")
+                }
+                
+                // Otherwise update UI and retry
+                onProgress("Retrying connection ($failStreak/$maxFailStreak)...")
             }
 
-            delay(10000L)
-            attempts++
+            delay(10_000L)
         }
         
-        throw IOException("Timeout polling for world generation")
+        throw Exception("Timed out after ${maxAttempts * 10 / 60} minutes. Please try again.")
     }
 }
 

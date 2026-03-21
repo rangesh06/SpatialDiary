@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.data.WorldLabsRepository
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,8 +36,13 @@ class ConvertViewModel : ViewModel() {
                 _uiState.value = ConvertUiState.Loading("Generating your 3D world...")
                 val operationId = repo.generateWorld(assetId)
 
-                _uiState.value = ConvertUiState.Loading("This takes ~5 mins, please wait...")
-                val splatUrl = repo.pollUntilReady(operationId)
+                // Give World Labs a few seconds to register the operation before polling
+                _uiState.value = ConvertUiState.Loading("Starting world generation...")
+                delay(5_000)
+
+                val splatUrl = repo.pollUntilReady(operationId) { progress ->
+                    _uiState.value = ConvertUiState.Loading(progress)
+                }
 
                 Log.d("WorldLabs", "SPZ URL: $splatUrl")
 
