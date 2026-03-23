@@ -27,17 +27,17 @@ class ConvertViewModel : ViewModel() {
     fun convertToWorld(videoFile: File) {
         viewModelScope.launch {
             try {
-                _uiState.value = ConvertUiState.Loading("Uploading video...")
+                _uiState.value = ConvertUiState.Loading("Uploading your video")
                 val (assetId, signedUrl) = repo.prepareUpload(videoFile.name)
 
-                _uiState.value = ConvertUiState.Loading("Sending to World Labs...")
+                _uiState.value = ConvertUiState.Loading("Sending to World Labs")
                 repo.uploadVideo(signedUrl, videoFile)
 
-                _uiState.value = ConvertUiState.Loading("Generating your 3D world...")
+                _uiState.value = ConvertUiState.Loading("Generating your 3D world")
                 val operationId = repo.generateWorld(assetId)
 
                 // Give World Labs a few seconds to register the operation before polling
-                _uiState.value = ConvertUiState.Loading("Starting world generation...")
+                _uiState.value = ConvertUiState.Loading("Starting world creation")
                 delay(5_000)
 
                 val splatUrl = repo.pollUntilReady(operationId) { progress ->

@@ -1,6 +1,13 @@
 package com.meta.wearable.dat.externalsampleapps.cameraaccess.ui
 
 import android.net.Uri
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,12 +15,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -23,16 +30,110 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.meta.wearable.dat.externalsampleapps.cameraaccess.R
 import java.io.File
+
+@Composable
+fun LoadingScreen(message: String) {
+    val infiniteTransition = rememberInfiniteTransition(label = "spinner")
+    val rotation by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "rotation"
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Background Image
+        Image(
+            painter = painterResource(id = R.drawable.loading_background),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Center Content (Logos & Title) - moved 10dp up
+        Column(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .padding(bottom = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(170.dp) // Increased outer container to fit larger outer logo
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.inner_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp)
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.outer_logo),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(170.dp) // Increased outer logo size to create visual gap
+                        .rotate(rotation)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Creating your 3D memory",
+                color = Color.White,
+                fontSize = 24.sp,
+                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans_bold)),
+                textAlign = TextAlign.Center
+            )
+        }
+
+        // Bottom Content (Status Messages)
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 68.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = message,
+                color = Color.White.copy(alpha = 0.80f),
+                fontSize = 18.sp,
+                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans_medium)),
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = "Please wait for 5 mins...",
+                color = Color.White.copy(alpha = 0.80f),
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(R.font.plus_jakarta_sans_medium)),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
 
 @Composable
 fun VideoPlayerScreen(
@@ -49,6 +150,11 @@ fun VideoPlayerScreen(
             splatUrl = (convertUiState as ConvertUiState.Success).splatUrl,
             onClose = { convertViewModel.resetState() }
         )
+        return
+    }
+
+    if (convertUiState is ConvertUiState.Loading) {
+        LoadingScreen(message = (convertUiState as ConvertUiState.Loading).message)
         return
     }
 
@@ -116,24 +222,6 @@ fun VideoPlayerScreen(
                 )
             ) {
                 Text(text = "Convert to 3D 🌍")
-            }
-        }
-
-        if (convertUiState is ConvertUiState.Loading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.6f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    CircularProgressIndicator(color = Color.White)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = (convertUiState as ConvertUiState.Loading).message,
-                        color = Color.White
-                    )
-                }
             }
         }
     }
