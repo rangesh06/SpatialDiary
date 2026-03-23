@@ -85,7 +85,7 @@ fun LoadingScreen(message: String) {
                 Image(
                     painter = painterResource(id = R.drawable.inner_logo),
                     contentDescription = null,
-                    modifier = Modifier.size(100.dp)
+                    modifier = Modifier.size(108.dp)
                 )
                 Image(
                     painter = painterResource(id = R.drawable.outer_logo),

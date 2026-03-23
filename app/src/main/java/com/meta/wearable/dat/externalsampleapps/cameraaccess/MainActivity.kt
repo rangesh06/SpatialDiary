@@ -26,6 +26,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import com.meta.wearable.dat.core.Wearables
 import com.meta.wearable.dat.core.types.Permission
 import com.meta.wearable.dat.core.types.PermissionStatus
@@ -33,6 +43,7 @@ import com.meta.wearable.dat.externalsampleapps.cameraaccess.ui.CameraAccessScaf
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.wearables.WearablesViewModel
 import kotlin.coroutines.resume
 import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -80,10 +91,26 @@ class MainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     enableEdgeToEdge()
     setContent {
-      CameraAccessScaffold(
-          viewModel = viewModel,
-          onRequestWearablesPermission = ::requestWearablesPermission,
-      )
+      var showSplash by remember { mutableStateOf(true) }
+
+      LaunchedEffect(Unit) {
+          delay(2000)
+          showSplash = false
+      }
+
+      if (showSplash) {
+          Image(
+              painter = painterResource(id = R.drawable.splash_screen),
+              contentDescription = "Splash Screen",
+              modifier = Modifier.fillMaxSize(),
+              contentScale = ContentScale.Crop
+          )
+      } else {
+          CameraAccessScaffold(
+              viewModel = viewModel,
+              onRequestWearablesPermission = ::requestWearablesPermission,
+          )
+      }
     }
   }
 
