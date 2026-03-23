@@ -13,9 +13,15 @@
 
 package com.meta.wearable.dat.externalsampleapps.cameraaccess.ui
 
-import android.widget.Toast
-import androidx.activity.compose.LocalActivity
+import android.annotation.SuppressLint
+import android.view.ViewGroup
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,15 +33,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LinkOff
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -43,28 +44,29 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.meta.wearable.dat.core.types.Permission
 import com.meta.wearable.dat.core.types.PermissionStatus
-import com.meta.wearable.dat.core.types.RegistrationState
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.R
 import com.meta.wearable.dat.externalsampleapps.cameraaccess.wearables.WearablesViewModel
 import kotlinx.coroutines.launch
 
+@SuppressLint("SetJavaScriptEnabled")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NonStreamScreen(
@@ -75,102 +77,171 @@ fun NonStreamScreen(
   val uiState by viewModel.uiState.collectAsStateWithLifecycle()
   val gettingStartedSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
   val scope = rememberCoroutineScope()
-  var dropdownExpanded by remember { mutableStateOf(false) }
-  val isDisconnectEnabled = uiState.registrationState is RegistrationState.Registered
-  val activity = LocalActivity.current
-  val context = LocalContext.current
 
   MaterialTheme(colorScheme = darkColorScheme()) {
     Box(
-        modifier = modifier.fillMaxSize().background(Color.Black).padding(all = 24.dp),
+        modifier = modifier.fillMaxSize().background(Color.Black),
         contentAlignment = Alignment.Center,
     ) {
-      Box(modifier = Modifier.align(Alignment.TopEnd).systemBarsPadding()) {
-        IconButton(onClick = { dropdownExpanded = true }) {
-          Icon(
-              imageVector = Icons.Default.LinkOff,
-              contentDescription = "DisconnectIcon",
-              tint = Color.White,
-              modifier = Modifier.size(28.dp),
-          )
-        }
+      // 1. Background Image
+      Image(
+          painter = painterResource(id = R.drawable.background_home),
+          contentDescription = "Background",
+          contentScale = ContentScale.Crop,
+          modifier = Modifier.fillMaxSize()
+      )
 
-        DropdownMenu(
-            expanded = dropdownExpanded,
-            onDismissRequest = { dropdownExpanded = false },
+      Column(
+          modifier = Modifier.fillMaxSize()
+      ) {
+        // 2. Top Bar
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 40.dp)
+                .padding(horizontal = 24.dp),
+            contentAlignment = Alignment.Center
         ) {
-          DropdownMenuItem(
-              text = {
-                Text(
-                    stringResource(R.string.unregister_button_title),
-                    color = if (isDisconnectEnabled) AppColor.Red else Color.Gray,
-                )
-              },
-              enabled = isDisconnectEnabled,
-              onClick = {
-                activity?.let { viewModel.startUnregistration(it) }
-                    ?: Toast.makeText(context, "Activity not available", Toast.LENGTH_SHORT).show()
-                dropdownExpanded = false
-              },
-              modifier = Modifier.height(30.dp),
+          Image(
+              painter = painterResource(id = R.drawable.top_bar__home_),
+              contentDescription = "Top Bar Background",
+              modifier = Modifier.fillMaxWidth(),
+              contentScale = ContentScale.FillWidth
           )
-        }
-      }
-
-      Column(
-          horizontalAlignment = Alignment.CenterHorizontally,
-          verticalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
-        Icon(
-            painter = painterResource(id = R.drawable.camera_access_icon),
-            contentDescription = stringResource(R.string.camera_access_icon_description),
-            tint = Color.White,
-            modifier = Modifier.size(80.dp * LocalDensity.current.density),
-        )
-        Text(
-            text = stringResource(R.string.non_stream_screen_title),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            color = Color.White,
-        )
-        Text(
-            text = stringResource(R.string.non_stream_screen_description),
-            textAlign = TextAlign.Center,
-            color = Color.White,
-        )
-      }
-
-      Column(
-          modifier = Modifier.align(Alignment.BottomCenter).navigationBarsPadding(),
-          horizontalAlignment = Alignment.CenterHorizontally,
-      ) {
-        if (!uiState.hasActiveDevice) {
           Row(
-              horizontalArrangement = Arrangement.spacedBy(8.dp),
+              modifier = Modifier.matchParentSize(),
               verticalAlignment = Alignment.CenterVertically,
-              modifier = Modifier.padding(bottom = 12.dp),
+              horizontalArrangement = Arrangement.SpaceBetween
           ) {
-            Icon(
-                painter = painterResource(id = R.drawable.hourglass_icon),
-                contentDescription = "Waiting for device",
-                tint = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.size(16.dp),
+            Image(
+                painter = painterResource(id = R.drawable.spatial_diary_logo_png),
+                contentDescription = "Spatial Diary Logo",
+                modifier = Modifier
+                    .padding(start = 16.dp)
+                    .size(34.dp)
             )
             Text(
-                text = stringResource(R.string.waiting_for_active_device),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White.copy(alpha = 0.7f),
+                text = "Spatial Diary",
+                color = Color.White,
+                fontSize = 16.sp,
+                modifier = Modifier.padding(end = 16.dp)
             )
           }
         }
 
-        // Start Streaming Button
-        SwitchButton(
-            label = stringResource(R.string.stream_button_title),
-            onClick = { viewModel.navigateToStreaming(onRequestWearablesPermission) },
-            enabled = uiState.hasActiveDevice,
+        // 3. Text 40 pixels below the top bar
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Text(
+            text = "Let's capture your 3D memory",
+            color = Color.White,
+            fontSize = 16.sp,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
+
+        // 4. Web view 16 px below the text
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Web view filling the available container space with stroke
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f) // Fills remaining vertical space
+                .padding(horizontal = 32.dp)
+                .border(
+                    width = 2.dp,
+                    color = Color.White.copy(alpha = 0.8f),
+                    shape = RoundedCornerShape(24.dp)
+                )
+                .clip(RoundedCornerShape(24.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+          AndroidView(
+              factory = { ctx ->
+                WebView(ctx).apply {
+                  layoutParams = ViewGroup.LayoutParams(
+                      ViewGroup.LayoutParams.MATCH_PARENT,
+                      ViewGroup.LayoutParams.MATCH_PARENT
+                  )
+                  settings.javaScriptEnabled = true
+                  settings.domStorageEnabled = true
+                  webChromeClient = WebChromeClient()
+                  webViewClient = WebViewClient()
+                  setBackgroundColor(android.graphics.Color.TRANSPARENT)
+                  loadUrl("https://rangesh06.github.io/splat-viewer/?url=https://sparkjs.dev/assets/splats/butterfly.spz")
+                }
+              },
+              modifier = Modifier.fillMaxSize()
+          )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // 5. Bottom Elements
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 64.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+          if (!uiState.hasActiveDevice) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(bottom = 4.dp),
+            ) {
+              Icon(
+                  painter = painterResource(id = R.drawable.hourglass_icon),
+                  contentDescription = "Waiting for device",
+                  tint = Color.White.copy(alpha = 0.7f),
+                  modifier = Modifier.size(16.dp),
+              )
+              Text(
+                  text = stringResource(R.string.waiting_for_active_device),
+                  style = MaterialTheme.typography.bodyMedium,
+                  color = Color.White.copy(alpha = 0.7f),
+              )
+            }
+          }
+
+          // Start Recording Button
+          Box(
+              modifier = Modifier
+                  .fillMaxWidth()
+                  .padding(horizontal = 48.dp)
+                  .alpha(if (uiState.hasActiveDevice) 1f else 0.5f)
+                  .clickable(enabled = uiState.hasActiveDevice) {
+                    viewModel.navigateToStreaming(onRequestWearablesPermission)
+                  },
+              contentAlignment = Alignment.Center
+          ) {
+            Image(
+                painter = painterResource(id = R.drawable.button),
+                contentDescription = "Start Recording Button Background",
+                modifier = Modifier.fillMaxWidth(),
+                contentScale = ContentScale.FillWidth
+            )
+            // Using a simple wrapped Row ensuring Icon and Text render on top of the button
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+              Icon(
+                  painter = painterResource(id = R.drawable.start_recording),
+                  contentDescription = "Start Recording Icon",
+                  tint = Color.White,
+                  modifier = Modifier.size(24.dp)
+              )
+              Spacer(modifier = Modifier.width(16.dp))
+              Text(
+                  text = "Start Recording",
+                  color = Color.White,
+                  fontSize = 20.sp,
+                  fontWeight = FontWeight.Medium
+              )
+            }
+          }
+        }
       }
 
       // Getting Started Sheet
