@@ -130,12 +130,12 @@ fun NonStreamScreen(
         }
 
         // 3. Text 40 pixels below the top bar
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Text(
             text = "Let's capture your 3D memory",
             color = Color.White,
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 

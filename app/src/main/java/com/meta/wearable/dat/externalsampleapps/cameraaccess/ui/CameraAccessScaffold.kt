@@ -37,6 +37,7 @@ import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -52,6 +53,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.meta.wearable.dat.core.types.Permission
@@ -125,6 +127,9 @@ fun CameraAccessScaffold(
         FloatingActionButton(
             onClick = { viewModel.showDebugMenu() },
             modifier = Modifier.align(Alignment.CenterEnd),
+            containerColor = Color.Transparent,
+            contentColor = Color.Transparent,
+            elevation = FloatingActionButtonDefaults.elevation(0.dp, 0.dp, 0.dp, 0.dp),
         ) {
           Icon(Icons.Default.BugReport, contentDescription = "Debug Menu")
         }
