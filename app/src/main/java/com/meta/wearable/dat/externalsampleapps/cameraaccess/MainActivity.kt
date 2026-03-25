@@ -120,3 +120,4 @@ class MainActivity : ComponentActivity() {
     permissionCheckLauncher.launch(PERMISSIONS)
   }
 }
+
