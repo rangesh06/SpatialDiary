@@ -192,21 +192,45 @@ class VideoRecorderImpl : VideoRecorder {
             }
 
             // Drain remaining output
-            drainEncoder(true)
+            try {
+                drainEncoder(true)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error draining encoder", e)
+            }
 
             // Release resources
-            codec.stop()
-            codec.release()
+            try {
+                codec.stop()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error stopping codec", e)
+            }
+            try {
+                codec.release()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error releasing codec", e)
+            }
             encoder = null
 
             if (isMuxerStarted) {
-                muxer?.stop()
+                try {
+                    muxer?.stop()
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error stopping muxer", e)
+                }
                 isMuxerStarted = false
             }
-            muxer?.release()
+            try {
+                muxer?.release()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error releasing muxer", e)
+            }
             muxer = null
 
-            outputFile ?: throw IllegalStateException("Output file is null")
+            val file = outputFile ?: throw IllegalStateException("Output file is null")
+            if (file.length() == 0L) {
+                throw IllegalStateException("Recorded file is empty")
+            }
+            file
         }
     }
 

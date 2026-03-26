@@ -133,14 +133,14 @@ fun NonStreamScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Let's capture your 3D memory",
+            text = "Capture your 3D memory",
             color = Color.White,
-            fontSize = 18.sp,
+            fontSize = 20.sp,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
 
         // 4. Web view 16 px below the text
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // Web view filling the available container space with stroke
         Box(

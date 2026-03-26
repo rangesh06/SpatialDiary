@@ -23,6 +23,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
 import androidx.lifecycle.AndroidViewModel
@@ -162,6 +163,9 @@ class StreamViewModel(
             }
             .onFailure { error ->
               Log.e(TAG, "Failed to stop recording", error)
+              viewModelScope.launch {
+                  Toast.makeText(getApplication(), "Recording failed or was too short", Toast.LENGTH_SHORT).show()
+              }
               wearablesViewModel.navigateToDeviceSelection()
             }
       }
