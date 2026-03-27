@@ -151,6 +151,8 @@ World Labs generates splats in three resolutions:
 
 On mobile, `full_res` can cause memory crashes or very slow loading. Start with `100k` during development and move to `500k` if you need more detail.
 
+This project uses "full_res" for maximum quality output.
+
 In `WorldLabsRepository.kt`:
 
 ```kotlin
