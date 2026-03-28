@@ -1,5 +1,5 @@
-# 🌍 Spatial Diary 
-[Android]
+# 🌍 Spatial Diary - Android
+
 <img width="261" height="278" alt="Banner 3" src="https://github.com/user-attachments/assets/cde212fd-17ad-4265-ad5b-70d836558f8c" />
 
 > Turn your Meta Ray-Ban footage into explorable 3D worlds — a memory you don't just keep, you walk back into.
