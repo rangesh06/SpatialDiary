@@ -108,7 +108,8 @@ Required to call the World Labs Marble API for 3D world generation.
 
 ## 🌐 Splat Viewer
 
-The 3D world is rendered inside an Android WebView using a custom **SparkJS** Gaussian splatting viewer hosted on GitHub Pages.
+The 3D world is rendered inside an Android WebView using a custom **ThreeJS** engine and **SparkJS** library. 
+THis Gaussian splatting viewer is hosted on GitHub Pages.
 
 **Viewer repo:** [github.com/rangesh06/splat-viewer](https://github.com/rangesh06/splat-viewer)
 
