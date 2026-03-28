@@ -5,7 +5,7 @@
 > Turn your Meta Ray-Ban footage into explorable 3D worlds. A memory you don't just keep, you walk back into.
 
 
-Spatial Diary is an open-source Android app that lets you record first-person POV video using your **Meta Ray-Ban glasses**, and converts it into a fully walkable **3D Gaussian Splat world** using the **World Labs Marble API** - rendered live on your phone through a custom **SparkJS WebView**.
+Spatial Diary is an Android app that lets you record first-person POV video using your **Meta Ray-Ban glasses**, and converts it into a fully walkable **3D Gaussian Splat world** using the **World Labs Marble API** - rendered live on your phone through a custom **SparkJS WebView**.
 
 ---
 
