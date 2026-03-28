@@ -176,7 +176,6 @@ splats.getString("full_res")
 
 ## 📋 API Flow
 
-```
 1. POST /media-assets:prepare_upload   → get signed URL + media asset ID
 2. PUT  <signed_url>                   → upload video file
 3. POST /worlds:generate               → trigger world generation
