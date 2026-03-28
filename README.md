@@ -171,6 +171,7 @@ splats.getString("500k")
 
 // Avoid on mobile
 splats.getString("full_res")
+
 ```
 
 ## 📋 API Flow
