@@ -38,7 +38,8 @@ SparkJS Web Viewer (WebView)
 
 ## 📣 Demo video
 
-[![Spatial Diary Demo](assets/demo.png)](https://twitter.com/RangeshUs/status/2037217205805605304)
+[![Spatial Diary Demo](https://img.shields.io/badge/Watch%20Demo-X%20%2F%20Twitter-000000?style=for-the-badge&logo=x&logoColor=white)](https://twitter.com/RangeshUs/status/2037217205805605304)
+
 Check this demo to understand the core functionality of the product.
 
 ---
