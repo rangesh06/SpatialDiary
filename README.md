@@ -186,18 +186,6 @@ splats.getString("full_res")
 
 ---
 
-## 📚 References
-
-| Resource | Link |
-|---|---|
-| Meta Wearables Developer Toolkit | [wearables.developer.meta.com/docs/develop](https://wearables.developer.meta.com/docs/develop) |
-| World Labs API Docs | [docs.worldlabs.ai/api](https://docs.worldlabs.ai/api) |
-| SparkJS Renderer | [sparkjs.dev](https://sparkjs.dev) |
-| Splat Viewer (this project) | [github.com/rangesh06/splat-viewer](https://github.com/rangesh06/splat-viewer) |
-| SPZ Format (Niantic) | [github.com/nianticlabs/spz](https://github.com/nianticlabs/spz) |
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome. Please open an issue first to discuss what you'd like to change.
@@ -210,9 +198,21 @@ Contributions are welcome. Please open an issue first to discuss what you'd like
 
 ---
 
+## 📚 References
+
+| Resource | Link |
+
+ Meta Wearables Developer Toolkit | [wearables.developer.meta.com/docs/develop](https://wearables.developer.meta.com/docs/develop) |
+ World Labs API Docs | [docs.worldlabs.ai/api](https://docs.worldlabs.ai/api) |
+ SparkJS Renderer | [sparkjs.dev](https://sparkjs.dev) |
+ Splat Viewer (this project) | [github.com/rangesh06/splat-viewer](https://github.com/rangesh06/splat-viewer) |
+ SPZ Format (Niantic) | [github.com/nianticlabs/spz](https://github.com/nianticlabs/spz) |
+
+---
+
 ## 📄 License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT License — see [LICENSE] for details.
 
 ---
 
