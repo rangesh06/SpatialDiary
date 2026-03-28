@@ -38,7 +38,7 @@ SparkJS Web Viewer (WebView)
 
 ## 📸 Video
 
-https://www.linkedin.com/posts/rangesh06_spatial-diary-turn-your-videos-into-worlds-activity-7442932121264013313-kDGz?utm_source=share&utm_medium=member_desktop&rcm=ACoAACvOvZQB0-25fwwH4IcOOhOgt-tpp3HTWPQ
+<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7442932069703340032?compact=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
 
 Check this demo to understand the core functionality of the product.
 
