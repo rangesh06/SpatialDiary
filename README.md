@@ -152,13 +152,13 @@ World Labs generates splats in three resolutions:
 
 | Resolution | Gaussians | File Size | Recommended For |
 |---|---|---|---|
-| `100k` | 100,000 | Smallest | Mobile / fast loading |
+| `100k` | 100,000 | Smallest | fast loading |
 | `500k` | 500,000 | Medium | Good balance |
-| `full_res` | Maximum | Largest | Desktop only |
+| `full_res` | Maximum | Largest | High quality | Long waiting time |
 
 On mobile, `full_res` can cause memory crashes or very slow loading. Start with `100k` during development and move to `500k` if you need more detail.
 
-This project uses "full_res" for maximum quality output.
+This project uses "full_res" for maximum quality and takes 5 mins to generate the world. 
 
 In `WorldLabsRepository.kt`:
 
@@ -174,13 +174,13 @@ splats.getString("full_res")
 
 ```
 
-## 📋 API Flow
+## 📋 API Flow (World Labs marble)
 
-1. POST /media-assets:prepare_upload   → get signed URL + media asset ID
-2. PUT  <signed_url>                   → upload video file
-3. POST /worlds:generate               → trigger world generation
-4. GET  /operations/{id}               → poll every 30s until done (~5 mins)
-5. Extract spz_urls.100k               → load in SparkJS WebView
+1. POST /media-assets:prepare_upload    → get signed URL + media asset ID
+2. PUT  <signed_url>                    → upload video file
+3. POST /worlds:generate                → trigger world generation
+4. GET  /operations/{id}                → poll every 30s until done (~5 mins)
+5. Extract spz_urls.100k                → load in SparkJS WebView
 
 ---
 
