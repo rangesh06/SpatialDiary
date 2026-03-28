@@ -2,7 +2,7 @@
 
 <img width="261" height="278" alt="Banner 3" src="https://github.com/user-attachments/assets/cde212fd-17ad-4265-ad5b-70d836558f8c" />
 
-> Turn your Meta Ray-Ban footage into explorable 3D worlds. A memory you don't just keep, you walk back into.
+> Turn your Meta Ray-Ban video footage into explorable 3D worlds. A memory you don't just keep, you walk back into.
 
 
 Spatial Diary is an Android app that lets you record first-person POV video using your **Meta Ray-Ban glasses**, and converts it into a fully walkable **3D Gaussian Splat world** using the **World Labs Marble API** - rendered live on your phone through a custom **SparkJS WebView**.
@@ -108,7 +108,7 @@ Required to call the World Labs Marble API for 3D world generation.
 
 ## 🌐 Splat Viewer
 
-The 3D world is rendered inside an Android WebView using a custom **Three.JS** engine and **Spark.JS** library. 
+The 3D world is rendered inside an Android WebView using a **Three.JS** + WebGLengine and **Spark.JS** library for splat processing. 
 THis Gaussian splatting viewer is hosted on GitHub Pages.
 
 **Viewer repo:** [github.com/rangesh06/splat-viewer](https://github.com/rangesh06/splat-viewer)
