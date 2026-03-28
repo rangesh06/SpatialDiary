@@ -97,7 +97,7 @@ Required to access the **Meta Wearables Developer Toolkit** which is distributed
 Required to call the World Labs Marble API for 3D world generation.
 
 1. Sign in at [platform.worldlabs.ai](https://platform.worldlabs.ai)
-2. Add a payment method and purchase credits
+2. You will get 7000 developer signup credits.
 3. Generate an API key from the [API Keys page](https://platform.worldlabs.ai/api-keys)
 4. Paste it as `worldlabsAPI` in `local.properties`
 
