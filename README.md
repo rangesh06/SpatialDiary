@@ -31,14 +31,14 @@ SparkJS Web Viewer (WebView)
 
 ---
 
-## Screenshots
+##  📸 Screenshots
 
 <img width="893" height="550" alt="Screenshots - Spatial Diary" src="https://github.com/user-attachments/assets/4adc995d-dcec-4880-a6c6-5c2a70572b62" />
 
 
-## 📸 Video
+## 📣 Demo video
 
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7442932069703340032?compact=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+[![Watch on LinkedIn](https://img.shields.io/badge/Watch%20Demo-LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/feed/update/urn:li:ugcPost:7442932069703340032)
 
 Check this demo to understand the core functionality of the product.
 
