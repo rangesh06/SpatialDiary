@@ -38,7 +38,7 @@ SparkJS Web Viewer (WebView)
 
 ## 📣 Demo video
 
-<blockquote class="twitter-tweet" data-media-max-width="560"><p lang="en" dir="ltr">Spatial Diary - Turn your videos into worlds you can walk back into.<br><br>Record a first person video with your <a href="https://twitter.com/Meta?ref_src=twsrc%5Etfw">@Meta</a> Ray-Bans. In minutes, your footage is reconstructed into a fully walkable 3D world using <a href="https://twitter.com/theworldlabs?ref_src=twsrc%5Etfw">@theworldlabs</a>.<br>A new way to capture and relive your memories.<br><br>🔊 Sound on <a href="https://t.co/kD1lEp5kTt">pic.twitter.com/kD1lEp5kTt</a></p>&mdash; Rangesh 👓 (@RangeshUs) <a href="https://twitter.com/RangeshUs/status/2037217205805605304?ref_src=twsrc%5Etfw">March 26, 2026</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+[![Spatial Diary Demo](assets/demo.png)](https://twitter.com/RangeshUs/status/2037217205805605304)
 Check this demo to understand the core functionality of the product.
 
 ---
