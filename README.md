@@ -1,6 +1,6 @@
 # 🌍 Spatial Diary
 
-<img width="327" height="348" alt="Banner 3" src="https://github.com/user-attachments/assets/cde212fd-17ad-4265-ad5b-70d836558f8c" />
+<img width="261" height="278" alt="Banner 3" src="https://github.com/user-attachments/assets/cde212fd-17ad-4265-ad5b-70d836558f8c" />
 
 > Turn your Meta Ray-Ban footage into explorable 3D worlds — a memory you don't just keep, you walk back into.
 
@@ -29,6 +29,14 @@ SparkJS Web Viewer (WebView)
 5. Walk through it, look around, relive it exactly as you lived it
 
 ---
+
+## Screenshots
+
+![1000109920](https://github.com/user-attachments/assets/5c53035c-f64d-4789-93b8-5aa63b63da3c)  ![1000109934](https://github.com/user-attachments/assets/9d84ae85-4cb9-4bcc-9a1d-78b532ef2e46) ![1000109938](https://github.com/user-attachments/assets/bb34f7e5-538f-4380-b57d-6e77b960171c)
+
+
+
+
 
 ## 📸 Video
 
