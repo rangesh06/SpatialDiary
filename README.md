@@ -202,7 +202,8 @@ Contributions are welcome. Please open an issue first to discuss what you'd like
 
 | Resource | Link |
 
- Meta Wearables Developer Toolkit | [wearables.developer.meta.com/docs/develop](https://wearables.developer.meta.com/docs/develop) |
+ Meta Wearables Developer Toolkit | [wearables.developer.meta.com/docs/develop]
+ (https://wearables.developer.meta.com/docs/develop) |
  World Labs API Docs | [docs.worldlabs.ai/api](https://docs.worldlabs.ai/api) |
  SparkJS Renderer | [sparkjs.dev](https://sparkjs.dev) |
  Splat Viewer (this project) | [github.com/rangesh06/splat-viewer](https://github.com/rangesh06/splat-viewer) |
