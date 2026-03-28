@@ -32,10 +32,7 @@ SparkJS Web Viewer (WebView)
 
 ## Screenshots
 
-![1000109920](https://github.com/user-attachments/assets/5c53035c-f64d-4789-93b8-5aa63b63da3c)  ![1000109934](https://github.com/user-attachments/assets/9d84ae85-4cb9-4bcc-9a1d-78b532ef2e46) ![1000109938](https://github.com/user-attachments/assets/bb34f7e5-538f-4380-b57d-6e77b960171c)
-
-
-
+<img width="893" height="550" alt="Screenshots - Spatial Diary" src="https://github.com/user-attachments/assets/4adc995d-dcec-4880-a6c6-5c2a70572b62" />
 
 
 ## 📸 Video
