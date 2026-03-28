@@ -173,8 +173,6 @@ splats.getString("500k")
 splats.getString("full_res")
 ```
 
----
-
 ## 📋 API Flow
 
 ```
